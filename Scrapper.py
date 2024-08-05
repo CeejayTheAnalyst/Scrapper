@@ -6,11 +6,15 @@ from collections import deque
 import re
 import os
 import pandas as pd
+from datetime import datetime
 
-# Create a folder in the user's home directory to store CSV files
-output_dir = os.path.join(os.path.expanduser("~"), "scraped_emails")
+
+# Create a folder on the user's desktop to store CSV files
+desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
+output_dir = os.path.join(desktop_path, "scraped_emails")
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
+
 
 def process_url(url):
     urls = deque([url])
@@ -61,8 +65,11 @@ if st.button("Submit"):
             emails, netloc = process_url(url.strip())
             if emails:
                 df = pd.DataFrame(list(emails), columns=["Email"])
-                csv_path = os.path.join(output_dir, f"{netloc}.csv")
+                # Generate a unique filename based on the current date and time
+                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+                csv_path = os.path.join(output_dir, f"{timestamp}.csv")
                 df.to_csv(csv_path, index=False)
                 st.write(f"Emails from {url.strip()} saved to {csv_path}")
             else:
                 st.write(f"No emails found on {url.strip()}")
+
